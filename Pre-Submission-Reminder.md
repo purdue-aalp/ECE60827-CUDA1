@@ -48,4 +48,12 @@ Here is a list of pre-submission checks:
 - push you tag to github classroom
 - verify latest commit and tag have reached github classroom by checking the web page
 
+## Autograder Information
+
+**Important:** The GitHub Classroom autograder only checks for build success. It verifies that:
+- Your code compiles successfully with `cmake` and `make`
+- The `build/lab1` executable is created
+
+The autograder does NOT test the correctness of your implementation. Separate tests will be conducted by the instructional team to evaluate the functionality and correctness of your code. Make sure to thoroughly test your implementation locally before submission.
+
 #pin

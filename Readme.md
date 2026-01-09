@@ -240,16 +240,34 @@ The shell commands required to build are listed below along with an expected out
 
 ```bash
 $ ./lab1
-ECE 695 - Lab 1 
-Select application: 
-  1 - CPU SAXPY 
-  2 - GPU SAXPY 
-  3 - CPU Monte-Carlo Pi 
-  4 - GPU Monte-Carlo Pi 
+ECE 695 - Lab 1
+Select application:
+  1 - CPU SAXPY
+  2 - GPU SAXPY
+  3 - CPU Monte-Carlo Pi
+  4 - GPU Monte-Carlo Pi
 >
 ```
 
 Selecting the appropriate option will result in execution of the corresponding application.
+
+-------------------------------------
+
+<br>
+
+## Submission and Autograding
+
+When you submit your assignment through GitHub Classroom, an autograder will run to verify your submission. **Important: The autograder only checks for build success.** It does not test the correctness of your implementation.
+
+The autograder will:
+1. Check out your code
+2. Run `cmake` to configure the build
+3. Run `make` to compile your code
+4. Verify that the `build/lab1` executable exists
+
+A passing autograder result means your code compiles successfully, but it does NOT guarantee that your implementation is correct. The instructional team will run separate tests to evaluate the functionality and correctness of your SAXPY and Monte Carlo Pi implementations.
+
+**Make sure to thoroughly test your code with various input sizes and edge cases before submission.** Refer to the [Pre-Submission-Reminder.md](Pre-Submission-Reminder.md) file for detailed submission guidelines and testing recommendations.
 
 -------------------------------------
 
