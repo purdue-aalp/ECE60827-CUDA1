@@ -1,8 +1,7 @@
-# ECE 695 CUDA Programming Part 1
+# ECE 60827 CUDA Programming Part 1
 
-## Professor: T. N. Vijaykumar <br> TA: Ni Kang
+## Professor: Timothy Rogers <br> TA: Junrui Pan
 
-## Due on Saturday, Feburary 8 at 11:59 PM ET (02/09 at 04:59 UTC)
 ## Introduction
 
 The purpose of this lab is to familiarize yourself with CUDA programming and the fundamental methodology for parallelizing a traditional CPU-based algorithm for GPU acceleration.  
@@ -200,14 +199,16 @@ The project is structured following a standard template to allow easy scalabilit
 
 The assignments use [CMake](https://cmake.org/) build system. Since it has a steep learning curve, the necessary `CMakeLists.txt` files have been provided with the starter code. 
 
-- `cmake .` (notice the DOT) is used to update the `Makefiles` 
+- `mkdir -p build`
+- `cd build`
+- `cmake ../` (notice the DOT) is used to update the `Makefiles` 
 - `make` is then used to build the application(s)
 - `make clean` can be used to cleanup the prebuilt binaries and libraries.
 
 The shell commands required to build are listed below along with an expected output.
 
 ```bash
- $ cmake .
+ $ cmake ../
 -- CMake version: 3.15.4
 -- USE_CUDA: ON
 -- Configuring done

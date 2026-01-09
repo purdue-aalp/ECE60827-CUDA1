@@ -1,0 +1,55 @@
+name: Autograding Tests
+
+on:
+  push:
+  workflow_dispatch:
+  repository_dispatch:
+
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/accel-sim/accel-sim-framework:Ubuntu-24.04-cuda-12.8-minimal
+    if: github.actor != 'github-classroom[bot]'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # -----------------------------
+    # Build step (CMake + Make)
+    # -----------------------------
+    - name: Build
+      run: |
+        mkdir -p build
+        cd build
+        cmake ..
+        make -j$(nproc)
+
+    # -----------------------------
+    # Autograding test
+    # -----------------------------
+    - name: Run Autograding Tests
+      id: test-1
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Basic Output Test
+        command: ./build/lab1
+        input: "1"
+        expected-output: "Test Passed!"
+        comparison-method: contains
+        timeout: 10
+        max-score: 100
+
+    # -----------------------------
+    # Report grades
+    # -----------------------------
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        BASIC-OUTPUT-TEST_RESULTS: ${{ steps.test-1.outputs.result }}

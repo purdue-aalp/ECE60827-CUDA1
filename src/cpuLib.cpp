@@ -107,6 +107,12 @@ int runCpuSaxpy(uint64_t vectorSize) {
 	int errorCount = verifyVector(a, b, c, scale, vectorSize);
 	std::cout << "Found " << errorCount << " / " << vectorSize << " errors \n";
 
+	if (errorCount == 0) {
+		std::cout << "Test Passed! \n";
+	} else {
+		std::cout << "Test Failed! \n";
+	}
+
 	return 0;
 }
 
