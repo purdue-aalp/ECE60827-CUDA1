@@ -53,6 +53,6 @@ jobs:
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
-        BUILD_SUCCESS_RESULTS: "${{ steps.build-success.outputs.result }}"
+        BUILD-SUCCESS_RESULTS: "${{ steps.build-success.outputs.result }}"
       with:
         runners: build-success
