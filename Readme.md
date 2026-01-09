@@ -240,16 +240,54 @@ The shell commands required to build are listed below along with an expected out
 
 ```bash
 $ ./lab1
-ECE 695 - Lab 1 
-Select application: 
-  1 - CPU SAXPY 
-  2 - GPU SAXPY 
-  3 - CPU Monte-Carlo Pi 
-  4 - GPU Monte-Carlo Pi 
+ECE 695 - Lab 1
+Select application:
+  1 - CPU SAXPY
+  2 - GPU SAXPY
+  3 - CPU Monte-Carlo Pi
+  4 - GPU Monte-Carlo Pi
 >
 ```
 
 Selecting the appropriate option will result in execution of the corresponding application.
+
+-------------------------------------
+
+<br>
+
+## Submission and Autograding
+
+When you submit your assignment through GitHub Classroom, an autograder will automatically test your implementation and assign a grade.
+
+### How the Autograder Works
+
+The autograder will:
+1. Check out your code
+2. Build your project using `cmake` and `make`
+3. Compile and run the grader against your implementation
+4. Test **Part A (SAXPY)** with various vector sizes
+5. Test **Part B (Monte Carlo Pi)** with various thread counts and sample sizes
+6. Award points based on test results
+
+### What Gets Tested
+
+**Part A - SAXPY:**
+- Your `saxpy_gpu` kernel is tested with multiple vector sizes
+- Results are verified against the CPU implementation
+
+**Part B - Monte Carlo Pi:**
+- Your `estimatePi` function is tested with various configurations
+- Pi estimates must be within acceptable tolerance of the actual value
+
+### Running the Grader Locally
+
+You can test your implementation locally before submitting:
+
+```bash
+./autograder/grade.sh
+```
+
+**Make sure to thoroughly test your code with various input sizes and edge cases before submission.** Refer to the [Pre-Submission-Reminder.md](Pre-Submission-Reminder.md) file for detailed submission guidelines and testing recommendations.
 
 -------------------------------------
 

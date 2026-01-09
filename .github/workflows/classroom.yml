@@ -1,9 +1,8 @@
 name: Autograding Tests
 
-on:
-  push:
-  workflow_dispatch:
-  repository_dispatch:
+'on':
+  - push
+  - repository_dispatch
 
 permissions:
   checks: write
@@ -12,9 +11,12 @@ permissions:
 
 jobs:
   run-autograding-tests:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/accel-sim/accel-sim-framework:Ubuntu-24.04-cuda-12.8-minimal
+    # you need to launch a self-hosted runner in the classroom organization with this name
+    runs-on: tgrogers-gpu01
+
+    # container:
+    #   image: ghcr.io/accel-sim/accel-sim-framework:Ubuntu-24.04-cuda-12.8-minimal
+
     if: github.actor != 'github-classroom[bot]'
 
     steps:
@@ -22,34 +24,73 @@ jobs:
       uses: actions/checkout@v4
 
     # -----------------------------
-    # Build step (CMake + Make)
+    # Build step (fails job on error)
     # -----------------------------
     - name: Build
       run: |
+        set -e
+        module load gcc/11.4.1 cuda
         mkdir -p build
         cd build
         cmake ..
-        make -j$(nproc)
+        make -j4
 
     # -----------------------------
-    # Autograding test
+    # Build the grader
     # -----------------------------
-    - name: Run Autograding Tests
-      id: test-1
-      uses: classroom-resources/autograding-io-grader@v1
+    - name: Build Grader
+      run: |
+        set -e
+        module load gcc/11.4.1 cuda
+        cd build
+        nvcc -o grader ../autograder/grader.cu \
+          -I../include \
+          -Lsrc \
+          -lcudaLib -lcpuLib \
+          -lcurand \
+          -Xcompiler -Wall
+
+    # -----------------------------
+    # Part A: SAXPY Tests (50 points)
+    # -----------------------------
+    - name: Part A - SAXPY
+      id: part-a
+      uses: classroom-resources/autograding-command-grader@v1
       with:
-        test-name: Basic Output Test
-        command: ./build/lab1
-        input: "1"
-        expected-output: "Test Passed!"
-        comparison-method: contains
-        timeout: 10
-        max-score: 100
+        test-name: "Part A - SAXPY (50 points)"
+        command: >
+          bash -lc '
+            module load cuda &&
+            cd build &&
+            ./grader --part-a
+          '
+        timeout: 60
+        max-score: 50
 
     # -----------------------------
-    # Report grades
+    # Part B: Monte Carlo Pi Tests (50 points)
+    # -----------------------------
+    - name: Part B - Monte Carlo Pi
+      id: part-b
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: "Part B - Monte Carlo Pi (50 points)"
+        command: >
+          bash -lc '
+            module load cuda &&
+            cd build &&
+            ./grader --part-b
+          '
+        timeout: 60
+        max-score: 50
+
+    # -----------------------------
+    # Report grades (MUST be last)
     # -----------------------------
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
-        BASIC-OUTPUT-TEST_RESULTS: ${{ steps.test-1.outputs.result }}
+        PART-A_RESULTS: "${{ steps.part-a.outputs.result }}"
+        PART-B_RESULTS: "${{ steps.part-b.outputs.result }}"
+      with:
+        runners: part-a,part-b

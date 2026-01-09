@@ -48,4 +48,33 @@ Here is a list of pre-submission checks:
 - push you tag to github classroom
 - verify latest commit and tag have reached github classroom by checking the web page
 
+## Autograder Information
+
+The GitHub Classroom autograder will automatically test your implementation and assign grades.
+
+### What Gets Tested
+
+**Part A - SAXPY:**
+- Tests your `saxpy_gpu` kernel with various vector sizes
+- Compares GPU results against CPU reference implementation
+
+**Part B - Monte Carlo Pi:**
+- Tests your `estimatePi` function with various thread counts and sample sizes
+- Verifies Pi estimates are within acceptable tolerance of actual Pi
+
+### Running the Grader Locally
+
+Before submitting, test your implementation locally:
+
+```bash
+./autograder/grade.sh
+```
+
+### Important Notes
+
+- **DO NOT modify files in the `autograder/` directory** - changes may cause grading failures
+- Implement your solutions in `src/cudaLib.cu`
+- The grader tests a wide range of input values - make sure your code handles edge cases
+- A passing local test should match the GitHub autograder results
+
 #pin
