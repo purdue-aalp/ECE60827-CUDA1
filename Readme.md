@@ -289,6 +289,10 @@ You can test your implementation locally before submitting:
 
 **Make sure to thoroughly test your code with various input sizes and edge cases before submission.** Refer to the [Pre-Submission-Reminder.md](Pre-Submission-Reminder.md) file for detailed submission guidelines and testing recommendations.
 
+### Important Note on Grading
+
+**Passing the autograder does not guarantee full credit.** The autograder only verifies that your code produces correct results. The instructor will review your code to determine the final grade. As long as your implementation follows the guidelines and uses the appropriate CUDA APIs as instructed, you will receive full credit.
+
 -------------------------------------
 
 <br>
@@ -298,45 +302,54 @@ You can test your implementation locally before submitting:
 
 ### Profiling a CUDA Application
 
-The CUDA SDK comes with a built in profiler `nvprof` [[3]](#3). 
+The CUDA SDK comes with the Nsight Systems profiler (`nsys`) for collecting and analyzing performance data.
 
-    The nvprof profiling tool enables you to collect and view profiling data from the command-line. nvprof enables the collection of a timeline of CUDA-related activities on both CPU and GPU, including kernel execution, memory transfers, memory set and CUDA API calls and events or metrics for CUDA kernels. Profiling options are provided to nvprof through command-line options. Profiling results are displayed in the console after the profiling data is collected, and may also be saved for later viewing
+Profiling a pre-built application is done in two steps:
 
-Profiling a pre-built application using the profiler is as simple as launching nvprof with the application path as argument.
-
+**Step 1: Collect profiling data**
 ```bash
-$ nvprof ./lab1
+$ nsys profile -o report1 ./build/lab1
 ```
 
-The profiler presents an interactive console which allows you to execute the application as usual and on application termination, provides a categorized table with values like below.
+This will generate a report file (`report1.nsys-rep`) after your application completes.
 
+**Step 2: View profiling statistics**
 ```bash
-           Type  Time(%)      Time     Calls       Avg       Min       Max  Name
- GPU activities:  
- 
-      API calls:   
+$ nsys stats --report cuda_api_sum,cuda_gpu_kern_sum,cuda_gpu_mem_time_sum ./report1.nsys-rep
 ```
 
-Refer the profiling section of [CUDA Toolkit Documentation](https://docs.nvidia.com/cuda/profiler-users-guide/index.html#nvprof-overview) for more details about the nvprof tool.
+This command generates summary tables showing:
+- `cuda_api_sum` - CUDA API call statistics
+- `cuda_gpu_kern_sum` - GPU kernel execution statistics
+- `cuda_gpu_mem_time_sum` - GPU memory operation statistics
 
-The nvprof output can be used to quantitatively measure the execution time of a CUDA application with a breakdown on the time spent in each kernel or API call. The profiler presents a wealth of information. It is imperative that you become familiar with utilizing the profiler information to measure code performance and the impact of optimization steps / changes in future labs.
+Each table shows timing breakdowns including total time, average time, min/max times, and call counts.
+
+Refer to the [Nsight Systems Documentation](https://docs.nvidia.com/nsight-systems/UserGuide/index.html) for more details.
+
+The profiler output can be used to quantitatively measure the execution time of a CUDA application with a breakdown on the time spent in each kernel or API call. It is imperative that you become familiar with utilizing the profiler information to measure code performance and the impact of optimization steps / changes in future labs.
 
 ### Reporting Profiler Output
 
-We expect you to present the information gleaned from profiling your application in the form of a stacked bar chart with which shows the execution time for varying input sizes with a breakdown of each API-Call or Kernel that takes up a major portion of the execution time. (see `time %` column of nvprof output).
+We expect you to present the information gleaned from profiling your application in the form of a stacked bar chart with which shows the execution time for varying input sizes with a breakdown of each API-Call or Kernel that takes up a major portion of the execution time. (see `time %` column of `nsys stats` output).
 
 - Illustrate the relation of execution time with each parameter you have varied and tested
     - eg vectorSize for Part A
-- Illustrate the breakup of execution time in terms of the major time-consumers as reported by `nvprof`
+- Illustrate the breakup of execution time in terms of the major time-consumers as reported by `nsys`
     - eg Suppose you have tested SAXPY for a set of vector sizes = _V_
     - for each v &in; _V_
-        - place a bar showing the breakup of execution time in terms the top time-consumers reported by `nvprof`
+        - place a bar showing the breakup of execution time in terms the top time-consumers reported by `nsys`
 - Make sure to label your graph axes and categories correctly.
 
 
-Report any observations you have from profiling the code you have written as well as by interpreting the above graph. Try to keep you report within a couple of pages.
+Report any observations you have from profiling the code you have written as well as by interpreting the above graph. Try to keep your report within a couple of pages.
 
+### Submission Requirements
 
+Include the following in your submission:
+- Your profiling report file named **`report1.nsys-rep`** in the root folder of your repository
+
+Make sure to commit `./report1.nsys-rep` to your repository before submitting.
 
 ## References
 <a id="1">[1]</a> 
@@ -345,5 +358,5 @@ Report any observations you have from profiling the code you have written as wel
 <a id="cppref">[2]</a>
 [cppreference](https://en.cppreference.com)
 
-<a id="nvprof">[3]</a>
-[CUDA Profiler User Guide](https://docs.nvidia.com/cuda/pdf/CUDA_Profiler_Users_Guide.pdf)
+<a id="nsys">[3]</a>
+[Nsight Systems User Guide](https://docs.nvidia.com/nsight-systems/UserGuide/index.html)

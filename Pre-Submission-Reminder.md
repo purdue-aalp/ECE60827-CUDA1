@@ -25,7 +25,7 @@ It will hep sanitize your code and avoid unpredictable behavior during runtime.
 `printf()`, `std::cout` and other console activity is quite expensive and might affect your profiling results
 If the prints are from the provided code libraries, you can easily get rid of them by setting the macro `DEBUG_PRINT_DISABLE`
 
-1. When profiling using `nvprof` ensure that your kernel is actually getting executed
+1. When profiling using `nsys` ensure that your kernel is actually getting executed
 A message 
 ```bash
 Profiling Result:
@@ -76,5 +76,9 @@ Before submitting, test your implementation locally:
 - Implement your solutions in `src/cudaLib.cu`
 - The grader tests a wide range of input values - make sure your code handles edge cases
 - A passing local test should match the GitHub autograder results
+
+### Grading Policy
+
+**Passing the autograder does not guarantee full credit.** The autograder only checks that your code produces correct results. The instructor will review your implementation to determine the final grade. As long as your code follows the guidelines and properly uses the CUDA APIs as instructed, you will receive full credit.
 
 #pin
