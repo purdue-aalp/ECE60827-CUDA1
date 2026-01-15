@@ -164,7 +164,7 @@ When you log in to the RCAC frontend, a Tesla V100 GPU is available for use. You
 
 You can also use Slurm to access newer Ampere GPUs like A30s. See the [RCAC Slurm GPU documentation](https://www.rcac.purdue.edu/knowledge/scholar/run/examples/slurm/gpu) for more details.
 
-Example command to run an interactive session with a GPU:
+Example command to run an program with a GPU:
 ```bash
 srun -A gpu-mig --gpus-per-node=1 nvidia-smi
 ```
@@ -186,6 +186,43 @@ Before you start writing and building code, the appropriate development toolkits
 ```bash
 module load gcc/11.4.1 cuda
 ```
+
+### Debugging CUDA Applications
+
+**cuda-gdb** is NVIDIA's debugger for CUDA applications. It extends GDB to support debugging GPU code, allowing you to set breakpoints in kernels, inspect GPU memory, and step through device code.
+
+Basic usage:
+```bash
+# Compile with debug symbols
+nvcc -g -G -o lab1 lab1.cu
+
+# Run with cuda-gdb
+cuda-gdb ./lab1
+```
+
+Common cuda-gdb commands:
+- `break kernel_name` - Set breakpoint at kernel entry
+- `cuda thread` - Show current CUDA thread
+- `cuda block` - Show current CUDA block
+- `info cuda threads` - List all CUDA threads
+- `print variable` - Print variable value (works for device variables too)
+
+Refer to the [cuda-gdb Documentation](https://docs.nvidia.com/cuda/cuda-gdb/index.html) for more details.
+
+**VSCode Nsight Visual Studio Code Edition**
+
+For those who prefer a graphical debugging experience, NVIDIA provides the [Nsight Visual Studio Code Edition](https://marketplace.visualstudio.com/items?itemName=NVIDIA.nsight-vscode-edition) extension. This extension integrates cuda-gdb into VSCode, providing:
+- GPU kernel debugging with breakpoints
+- Variable inspection for device memory
+- CUDA thread/block navigation
+- Integration with CUDA memory checker
+
+To use it:
+1. Install the extension from the VSCode marketplace
+2. Configure your `launch.json` for CUDA debugging
+3. Build your project in debug mode: `cmake -DCMAKE_BUILD_TYPE=Debug ..` then `make`
+
+Refer to the [Nsight VSCode Edition Documentation](https://docs.nvidia.com/nsight-visual-studio-code-edition/) for setup instructions.
 
 ## Project Organization
 
@@ -380,6 +417,10 @@ If you implement the reduce kernel, answer these additional questions in your re
 Include your written report named **`report.pdf`** in the root folder of your repository.
 
 Make sure to commit `./report.pdf` to your repository before submitting.
+
+### Academic Integrity
+
+**The use of AI tools (ChatGPT, GitHub Copilot, Claude, etc.) is prohibited for this assignment.** All code must be written by you. Violations will be treated as academic dishonesty.
 
 ## References
 <a id="1">[1]</a> 
