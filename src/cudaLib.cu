@@ -15,11 +15,16 @@ void saxpy_gpu (float* x, float* y, float scale, int size) {
 	//	Insert GPU SAXPY kernel code here
 }
 
-int runGpuSaxpy(int vectorSize) {
+int runGpuSaxpy(float* x, float* y, float scale, int size) {
 
 	std::cout << "Hello GPU Saxpy!\n";
 
 	//	Insert code here
+	//	- Allocate GPU memory for x and y
+	//	- Copy x and y from host to device
+	//	- Launch saxpy_gpu kernel
+	//	- Copy result (y) back from device to host
+	//	- Free GPU memory
 	std::cout << "Lazy, you are!\n";
 	std::cout << "Write code, you must\n";
 

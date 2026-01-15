@@ -10,6 +10,7 @@
  */
 
 #include <iostream>
+#include <cstring>
 #include "lab1.cuh"
 #include "cpuLib.h"
 #include "cudaLib.cuh"
@@ -40,9 +41,36 @@ int main(int argc, char** argv) {
 
 		//  CUDA + GPU SAXPY
 		case 2:
-			std::cout << "Running SAXPY GPU! \n\n";
-			runGpuSaxpy(VECTOR_SIZE);
-			std::cout << "\n\n ... Done!\n";
+			{
+				std::cout << "Running SAXPY GPU! \n\n";
+				int vectorSize = VECTOR_SIZE;
+				float* x = new float[vectorSize];
+				float* y = new float[vectorSize];
+				float scale = 2.0f;
+
+				// Initialize vectors with random values
+				vectorInit(x, vectorSize);
+				vectorInit(y, vectorSize);
+
+				// Backup y for verification
+				float* y_backup = new float[vectorSize];
+				std::memcpy(y_backup, y, vectorSize * sizeof(float));
+
+				runGpuSaxpy(x, y, scale, vectorSize);
+
+				// Verify with CPU
+				int errors = verifyVector(x, y_backup, y, scale, vectorSize);
+				if (errors == 0) {
+					std::cout << "SAXPY verification PASSED!\n";
+				} else {
+					std::cout << "SAXPY verification FAILED with " << errors << " errors!\n";
+				}
+
+				delete[] x;
+				delete[] y;
+				delete[] y_backup;
+				std::cout << "\n\n ... Done!\n";
+			}
 			break;
 
 		case 3:

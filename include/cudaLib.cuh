@@ -42,14 +42,18 @@
 
 	/**
 	 * @brief Entrypoint for GPU SAXPY application
-	 *			- Must generate vectors of the appropriate size
-	 *			- Perform GPU SAXPY
-	 *			- Verify using CPU and report errors if any
-	 * 
-	 * @param vectorSize int	size of vector 
-	 * @return int 
+	 *			- Allocate GPU memory
+	 *			- Copy input vectors to GPU
+	 *			- Launch saxpy_gpu kernel
+	 *			- Copy result back to y vector
+	 *
+	 * @param x 		float*	pointer to input vector X (host memory)
+	 * @param y 		float*	pointer to input/output vector Y (host memory)
+	 * @param scale 	float	scale factor
+	 * @param size 		int		size of vectors
+	 * @return int 		0 on success, non-zero on failure
 	 */
-	extern int runGpuSaxpy(int vectorSize);
+	extern int runGpuSaxpy(float* x, float* y, float scale, int size);
 
 	/**
 	 * @brief GPU Kernel for performing SAXPY (Y += Scale * X)

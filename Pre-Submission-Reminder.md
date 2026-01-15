@@ -41,7 +41,7 @@ Here is a list of pre-submission checks:
 - ensure all you source and header files are part of your repo and have been committed.
 - **DO NOT** commit executables (including .a libraries and .o executables)
     - always run make clean before committing
-- add your report in .pdf format to the repo
+- add your report as `report.pdf` in the root folder of your repo
 - push your commit to github classroom
 - tag your commit as `submission`
     - if you are unfamiliar with git check [git documentation](https://git-scm.com/book/en/v2/Git-Basics-Tagging)
@@ -72,7 +72,7 @@ Before submitting, test your implementation locally:
 
 ### Important Notes
 
-- **DO NOT modify files in the `autograder/` directory** - changes may cause grading failures
+- **DO NOT modify files in the `autograder/` directory** - any changes to these files will be flagged and result in an instant 0
 - Implement your solutions in `src/cudaLib.cu`
 - The grader tests a wide range of input values - make sure your code handles edge cases
 - A passing local test should match the GitHub autograder results

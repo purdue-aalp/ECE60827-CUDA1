@@ -15,7 +15,7 @@ void dbprintf(const char* fmt...) {
 
 void vectorInit(float* v, int size) {
 	for (int idx = 0; idx < size; ++idx) {
-		v[idx] = (float)(rand() % 100);
+		v[idx] = (float)idx;
 	}
 }
 

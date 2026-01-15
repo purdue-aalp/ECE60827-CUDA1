@@ -51,13 +51,17 @@ Furthermore, the elements of each vector can be generated using the `rand()` fun
 
 ### Expected Behavior
 
-The following behavior is expected from  `int runGpuSaxpy(int vectorSize)` 
+The following behavior is expected from `int runGpuSaxpy(float* x, float* y, float scale, int size)`:
 
-- generate two random floating point vectors `x` and `y` of `vectorSize` each
-- use a GPU kernel to perform `Y += aX` 
-    - a is a random floating point scaling factor
-- verify the kernel using CPU code
-    - you may use the functions already provided in `cpuLib` library
+- `x` and `y` are pre-allocated host memory arrays of size `size`
+- `scale` is the scaling factor (A in SAXPY)
+- The function should:
+    - Allocate GPU memory for `x` and `y`
+    - Copy `x` and `y` from host to device
+    - Launch the `saxpy_gpu` kernel to perform `Y += scale * X`
+    - Copy the result (`y`) back from device to host
+    - Free GPU memory
+- Return 0 on success, non-zero on failure
 
 
 
@@ -147,33 +151,32 @@ While running a large Monte-Carlo simulation (>> 1 bn values) you will end up ru
 ## Preparing your System
 
 All students will have access to GPU resources through gpu.scholar.rcac.purdue.edu.
-You should be able to use your Purdue Career Accounts to
-ssh into gpu.scholar.rcac.purdue.edu and access a GPU there. You are also free to use your own GPU if you have access to one.
-Contact the instructors on Piazza for any trouble regarding access to the same.
+You should be able to use your Purdue Career Accounts to ssh into gpu.scholar.rcac.purdue.edu and access a GPU there. You are also free to use your own GPU if you have access to one, but note that **grading will be done on RCAC** - any failures due to environment differences on your personal machine are your responsibility.
+If you have trouble accessing RCAC GPU resources, post on Piazza.
+
+### GPU Access Options
+
+**Option 1: Frontend V100 GPU**
+
+When you log in to the RCAC frontend, a Tesla V100 GPU is available for use. You can use it directly after logging in.
+
+**Option 2: Slurm for Ampere GPUs (A30)**
+
+You can also use Slurm to access newer Ampere GPUs like A30s. See the [RCAC Slurm GPU documentation](https://www.rcac.purdue.edu/knowledge/scholar/run/examples/slurm/gpu) for more details.
+
+Example command to run an interactive session with a GPU:
+```bash
+srun -A gpu-mig --gpus-per-node=1 nvidia-smi
+```
 
 ### Check for GPU & Drivers
-The default setup of the machines available for the class has all the software you need to build and test your project. Ensure that the cuda driver is installed and working with the below command.
+The default setup of the machines available for the class has all the software you need to build and test your project. Ensure that the CUDA driver is installed and working with the below command.
 
 ```bash
 $ nvidia-smi
-+-----------------------------------------------------------------------------+
-| NVIDIA-SMI 440.33.01    Driver Version: 440.33.01    CUDA Version: 10.2     |
-|-------------------------------+----------------------+----------------------+
-| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
-| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
-|===============================+======================+======================|
-|   0  Tesla V100-PCIE...  Off  | 00000000:D8:00.0 Off |                    0 |
-| N/A   35C    P0    37W / 250W |      0MiB / 16160MiB |      0%      Default |
-+-------------------------------+----------------------+----------------------+
-
-+-----------------------------------------------------------------------------+
-| Processes:                                                       GPU Memory |
-|  GPU       PID   Type   Process name                             Usage      |
-|=============================================================================|
-|  No running processes found                                                 |
-+-----------------------------------------------------------------------------+
 ```
-This command can also be used to identify any stray kernels you might have running in the background and kill the corresponding process.
+
+This command shows the available GPU, driver version, and CUDA version. It can also be used to identify any stray kernels you might have running in the background and kill the corresponding process.
 
 ### Setup Environment
 
@@ -289,6 +292,8 @@ You can test your implementation locally before submitting:
 
 **Make sure to thoroughly test your code with various input sizes and edge cases before submission.** Refer to the [Pre-Submission-Reminder.md](Pre-Submission-Reminder.md) file for detailed submission guidelines and testing recommendations.
 
+**DO NOT modify files in the `autograder/` directory** - any changes to these files will be flagged and result in an instant 0.
+
 ### Important Note on Grading
 
 **Passing the autograder does not guarantee full credit.** The autograder only verifies that your code produces correct results. The instructor will review your code to determine the final grade. As long as your implementation follows the guidelines and uses the appropriate CUDA APIs as instructed, you will receive full credit.
@@ -329,27 +334,52 @@ Refer to the [Nsight Systems Documentation](https://docs.nvidia.com/nsight-syste
 
 The profiler output can be used to quantitatively measure the execution time of a CUDA application with a breakdown on the time spent in each kernel or API call. It is imperative that you become familiar with utilizing the profiler information to measure code performance and the impact of optimization steps / changes in future labs.
 
-### Reporting Profiler Output
+### Report Questions
 
-We expect you to present the information gleaned from profiling your application in the form of a stacked bar chart with which shows the execution time for varying input sizes with a breakdown of each API-Call or Kernel that takes up a major portion of the execution time. (see `time %` column of `nsys stats` output).
+Answer the following questions in your report (keep your report within a couple of pages):
 
-- Illustrate the relation of execution time with each parameter you have varied and tested
-    - eg vectorSize for Part A
-- Illustrate the breakup of execution time in terms of the major time-consumers as reported by `nsys`
-    - eg Suppose you have tested SAXPY for a set of vector sizes = _V_
-    - for each v &in; _V_
-        - place a bar showing the breakup of execution time in terms the top time-consumers reported by `nsys`
-- Make sure to label your graph axes and categories correctly.
+1. **How does execution time change with input size?**
+   - Run your SAXPY implementation with multiple vector sizes and record the execution time for each.
+   - Create a graph showing execution time vs. vector size.
 
+2. **What are the major time-consuming operations?**
+   - Using the `nsys stats` output, identify which CUDA API calls and kernels take up the most time.
+   - Create a stacked bar chart showing the breakdown of execution time for different input sizes.
+   - Make sure to label your graph axes and categories correctly.
 
-Report any observations you have from profiling the code you have written as well as by interpreting the above graph. Try to keep your report within a couple of pages.
+3. **What observations can you make from the profiling data?**
+   - Are there any patterns or trends you notice?
+   - What takes the most time: memory transfers or kernel execution?
+   - How does the ratio change as input size increases?
+
+### Extra Credit (20 points)
+
+Implement the optional `reduceCounts` kernel for the Monte Carlo Pi estimation. Instead of copying all partial sums back to the CPU and summing them there, use a GPU reduction kernel to reduce the partial sums on the GPU first.
+
+If you implement the reduce kernel, answer these additional questions in your report:
+
+4. **How does using the reduce kernel affect performance?**
+   - Compare execution time with and without the reduce kernel.
+   - At what problem sizes (if any) does the reduce kernel provide a benefit?
+
+5. **What is the tradeoff between GPU reduction and CPU reduction?**
+   - When is it better to sum on the CPU vs. using a GPU reduction kernel?
+
+### Grading Rubric
+
+| Component | Points |
+|-----------|--------|
+| Part A - SAXPY | 40 |
+| Part B - Monte Carlo Pi | 40 |
+| Report | 20 |
+| **Total** | **100** |
+| Extra Credit - Reduce Kernel | +20 |
 
 ### Submission Requirements
 
-Include the following in your submission:
-- Your profiling report file named **`report1.nsys-rep`** in the root folder of your repository
+Include your written report named **`report.pdf`** in the root folder of your repository.
 
-Make sure to commit `./report1.nsys-rep` to your repository before submitting.
+Make sure to commit `./report.pdf` to your repository before submitting.
 
 ## References
 <a id="1">[1]</a> 

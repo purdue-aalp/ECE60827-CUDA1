@@ -97,7 +97,7 @@ fi
 echo -e "${GREEN}✓${NC} CMake configuration successful"
 
 echo "Running make..."
-if ! make > make_output.log 2>&1; then
+if ! srun -c4 make -j > make_output.log 2>&1; then
     echo -e "${RED}✗ ERROR: make build failed${NC}"
     echo "See ${BUILD_DIR}/make_output.log for details"
     cat make_output.log

@@ -22,6 +22,8 @@
 #include <iomanip>
 #include <cmath>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 
 // Test configuration
 struct TestConfig {
@@ -74,29 +76,72 @@ private:
     bool testSaxpySingleSize(int vectorSize) {
         std::cout << "\n  Testing SAXPY with vector size: " << vectorSize << "\n";
 
+        // Allocate and initialize vectors
+        float* x = new float[vectorSize];
+        float* y = new float[vectorSize];
+        float* y_expected = new float[vectorSize];
+        float scale = 2.5f;
+
+        // Initialize vectors with random values
+        srand(42 + vectorSize);  // Deterministic seed based on vector size
+        for (int i = 0; i < vectorSize; i++) {
+            x[i] = static_cast<float>(rand() % 1000) / 10.0f;
+            y[i] = static_cast<float>(rand() % 1000) / 10.0f;
+            y_expected[i] = y[i];  // backup for CPU verification
+        }
+
+        // Compute expected result using CPU
+        for (int i = 0; i < vectorSize; i++) {
+            y_expected[i] = scale * x[i] + y_expected[i];
+        }
+
         // Call the student's runGpuSaxpy function
-        // This function should:
-        // - Allocate GPU memory
-        // - Copy data to GPU
-        // - Launch the saxpy_gpu kernel
-        // - Verify results against CPU
-        // - Return 0 on success, non-zero on failure
-        int result = runGpuSaxpy(vectorSize);
+        int result = runGpuSaxpy(x, y, scale, vectorSize);
 
         // Check for any CUDA errors that may have occurred
         cudaError_t err = cudaGetLastError();
         if (err != cudaSuccess) {
             std::cout << "    [ERROR] CUDA error: " << cudaGetErrorString(err) << "\n";
+            delete[] x; delete[] y; delete[] y_expected;
             return false;
         }
 
-        if (result == 0) {
-            std::cout << "    runGpuSaxpy returned success\n";
-            return true;
-        } else {
+        if (result != 0) {
             std::cout << "    runGpuSaxpy returned failure (code: " << result << ")\n";
+            delete[] x; delete[] y; delete[] y_expected;
             return false;
         }
+
+        // Verify results against CPU computation
+        bool passed = true;
+        int errorCount = 0;
+        const int maxErrorsToShow = 5;
+        const float tolerance = 1e-4f;
+
+        for (int i = 0; i < vectorSize; i++) {
+            float diff = std::abs(y[i] - y_expected[i]);
+            if (diff > tolerance) {
+                if (errorCount < maxErrorsToShow) {
+                    std::cout << "    [MISMATCH] Index " << i << ": GPU=" << y[i]
+                              << " Expected=" << y_expected[i] << " diff=" << diff << "\n";
+                }
+                errorCount++;
+                passed = false;
+            }
+        }
+
+        if (!passed) {
+            std::cout << "    Total mismatches: " << errorCount << " out of " << vectorSize << "\n";
+        } else {
+            std::cout << "    All values match (tolerance: " << tolerance << ")\n";
+        }
+
+        // Cleanup
+        delete[] x;
+        delete[] y;
+        delete[] y_expected;
+
+        return passed;
     }
 
     bool testMonteCarloPi(uint64_t threadCount, uint64_t sampleSize) {

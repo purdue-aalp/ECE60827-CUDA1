@@ -33,7 +33,7 @@ jobs:
         mkdir -p build
         cd build
         cmake ..
-        make -j4
+        srun -c4 make -j
 
     # -----------------------------
     # Build the grader
@@ -51,13 +51,13 @@ jobs:
           -Xcompiler -Wall
 
     # -----------------------------
-    # Part A: SAXPY Tests (50 points)
+    # Part A: SAXPY Tests (40 points)
     # -----------------------------
     - name: Part A - SAXPY
       id: part-a
       uses: classroom-resources/autograding-command-grader@v1
       with:
-        test-name: "Part A - SAXPY (50 points)"
+        test-name: "Part A - SAXPY (40 points)"
         command: >
           bash -lc '
             module load cuda &&
@@ -65,16 +65,16 @@ jobs:
             ./grader --part-a
           '
         timeout: 60
-        max-score: 50
+        max-score: 40
 
     # -----------------------------
-    # Part B: Monte Carlo Pi Tests (50 points)
+    # Part B: Monte Carlo Pi Tests (40 points)
     # -----------------------------
     - name: Part B - Monte Carlo Pi
       id: part-b
       uses: classroom-resources/autograding-command-grader@v1
       with:
-        test-name: "Part B - Monte Carlo Pi (50 points)"
+        test-name: "Part B - Monte Carlo Pi (40 points)"
         command: >
           bash -lc '
             module load cuda &&
@@ -82,7 +82,7 @@ jobs:
             ./grader --part-b
           '
         timeout: 60
-        max-score: 50
+        max-score: 40
 
     # -----------------------------
     # Report grades (MUST be last)
